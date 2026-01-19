@@ -3,8 +3,6 @@
 
 ## 📄 SENTINEL.EXE | AI-Powered Firewall Defense
 
-!
-
 ### 🌌 Overview
 
 **SENTINEL.EXE** is an experimental Tower Defense game built for the **2026 Google AI "New Year, New You" Portfolio Challenge**.
@@ -108,6 +106,11 @@ GOOGLE_API_KEY=your_api_key_here
 python3 main.py
 
 ```
+
+---
+
+### 🐛 Error Handling & Model Fallback
+During development, I encountered model-specific quota limits (429 Resource Exhausted). To ensure high availability for the game, I implemented a strategy to prioritize the highly-efficient Gemini 1.5 Flash model, which balances performance with reliability for the end-user.
 
 ---
 
