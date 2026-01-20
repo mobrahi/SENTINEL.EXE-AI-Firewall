@@ -30,3 +30,21 @@ LOCAL_LORE_BACKUP = [
     "CORE_ALERT: Sentient malware attempting to bypass encryption.",
     "PROTOCOL_ALPHA: Security cycles low. Expect heavy packet loss."
 ]
+
+# The virus enters at (0, 100), moves across, and ends at the Core
+# Waypoints are defined in (x, y) pixels
+ENEMY_PATH = [(0, 100), (400, 100), (400, 400), (800, 400), (800, 200), (1200, 200)]
+
+# --- Tower Settings ---
+TOWER_RANGE = 150       # Pixels
+TOWER_COOLDOWN = 1000   # Milliseconds (1 second between shots)
+PROJECTILE_SPEED = 7
+
+# --- System Integrity ---
+MAX_INTEGRITY = 100
+CORE_POS = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+
+# --- Economics ---
+STARTING_CYCLES = 100
+TOWER_COST = 50
+REWARD_PER_VIRUS = 20

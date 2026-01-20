@@ -109,8 +109,20 @@ python3 main.py
 
 ---
 
-### 🐛 Error Handling & Model Fallback
-During development, I encountered model-specific quota limits (429 Resource Exhausted). To ensure high availability for the game, I implemented a strategy to prioritize the highly-efficient Gemini 1.5 Flash model, which balances performance with reliability for the end-user.
+## 🛠 Technical Challenges & Solutions
+
+### 🤖 Real-Time AI Integration
+**Challenge:** How do you query a Cloud LLM without freezing a 60FPS game loop?
+**Solution:** Offloaded Gemini API calls to a **Background Thread**, allowing the main game loop to continue rendering and processing input. A thread-safe flag system was implemented to update the UI once the AI response is received.
+
+### 📉 Smart Rate-Limit Handling (429 Handling)
+**Challenge:** Managing the Google Gemini Free Tier limits (15 requests/min).
+**Solution:** Built a **Tactical Cooldown System** and **Local Fallback Subroutines**. If the API is exhausted or the network is disconnected, the game automatically switches to a local library of pre-calculated tips, ensuring the "AI Advisor" feature never breaks the immersion.
+
+### 🌊 Procedural Wave Scaling
+**Challenge:** Creating a game that gets progressively harder without manually coding 100 waves.
+**Solution:** Developed a wave logic system that scales enemy health and speed using dynamic multipliers, passed into the Enemy class at instantiation.
+
 
 ---
 
