@@ -20,6 +20,8 @@ class GameApp:
         pygame.display.set_caption("SENTINEL.EXE | AI Firewall")
         self.font = pygame.font.SysFont("Courier", 18)
         self.clock = pygame.time.Clock()
+
+        self.core_rect = pygame.Rect(C.SCREEN_WIDTH//2-20, C.SCREEN_HEIGHT//2-20, 40, 40)
         
         # Stats
         self.cycles = C.STARTING_CYCLES
@@ -51,6 +53,7 @@ class GameApp:
      
         self.spawn_timer = 0
         self.score = 0
+        self.flash_timer = 0
 
     # --- AI LOGIC (NON-BLOCKING) ---
 
@@ -185,11 +188,45 @@ class GameApp:
             self.projectiles.update()
             
             # Collisions
-            hits = pygame.sprite.groupcollide(self.enemies, self.projectiles, True, True)
+            # Check if any projectile hit any enemy. 
+            # False = Don't kill the enemy yet. True = Kill the projectile.
+            hits = pygame.sprite.groupcollide(self.enemies, self.projectiles, False, True)
             if hits:
                 for enemy_hit in hits:
-                    self.cycles += C.REWARD_PER_VIRUS
-                    self.score += 1 # Increase score for every kill
+                    # Reduce health instead of instant kill
+                    enemy_hit.health -= 1
+                    
+                    # Check if direction exists and is not zero
+                    if hasattr(enemy_hit, 'direction') and enemy_hit.direction.length() > 0:
+                        # Push back by 5 pixels (Impact feedback)
+                        enemy_hit.pos -= enemy_hit.direction.normalize() * 5
+                        enemy_hit.rect.center = enemy_hit.pos
+                    
+                    # Check if the virus is actually "dead"
+                    if enemy_hit.health <= 0:
+                        enemy_hit.kill()
+                        self.cycles += C.REWARD_PER_VIRUS
+                        self.score += 1 # Increase score for every kill
+                        print(f"Virus Purged! Total Score: {self.score}")
+
+           
+            for enemy in self.enemies:
+                if enemy.rect.colliderect(self.core_rect):
+                    # 1. BIT A LITTLE: Only reduce integrity by a small amount (e.g., 0.1)
+                    # Using a small number makes it feel like a "drain"
+                    self.integrity -= 0.1 
+        
+                    # 2. TRIGGER FLASH: We still want the visual feedback
+                    # We only flash periodically so it's not a constant blinding red
+                    if pygame.time.get_ticks() % 500 < 20: 
+                        self.flash_timer = pygame.time.get_ticks()
+            
+                    # 3. DO NOT KILL: We don't call enemy.kill() here anymore.
+                    # The virus will simply slide over the core and continue its path.
+
+                # 4. FINAL CLEANUP: The virus only disappears when it hits the actual end
+                if enemy.reached_end:
+                    enemy.kill()
 
             # Breach Detection
             for enemy in self.enemies:
@@ -274,13 +311,16 @@ class GameApp:
             self.projectiles.draw(self.screen)
             pygame.draw.rect(self.screen, C.CORE_COLOR, (C.SCREEN_WIDTH//2-20, C.SCREEN_HEIGHT//2-20, 40, 40))
 
+            for enemy in self.enemies:
+                enemy.draw_health_bar(self.screen)
+
             # Draw UI Bar
             pygame.draw.rect(self.screen, (50, 0, 0), (20, 20, 200, 20)) # Dark Red BG
             health_fill = (self.integrity / C.MAX_INTEGRITY) * 200
             pygame.draw.rect(self.screen, C.ACCENT_COLOR, (20, 20, health_fill, 20)) # Health Fill
             
             # Draw UI Text (With slight black shadow for 2026 visibility standards)
-            integrity_str = f"INTEGRITY: {self.integrity}%"
+            integrity_str = f"INTEGRITY: {int(self.integrity)}%"
             cycles_str = f"CPU_CYCLES: {self.cycles} Ghz"
             cost_str = f"NODE_COST: {C.TOWER_COST}" # Added the specific node cost
 
@@ -322,7 +362,16 @@ class GameApp:
                 # 5. REBOOT Instruction (Centered at bottom)
                 reboot_text = self.font.render("--- PRESS 'R' TO REBOOT SYSTEM ---", True, (255, 255, 255))
                 self.screen.blit(reboot_text, (C.SCREEN_WIDTH//2 - 180, C.SCREEN_HEIGHT - 80))
-    
+
+        if self.state == "PLAYING":
+            # Check if 100ms have passed since the last hit
+            if pygame.time.get_ticks() - self.flash_timer < 100:
+                # Create a red surface with alpha (transparency)
+                flash_surf = pygame.Surface((C.SCREEN_WIDTH, C.SCREEN_HEIGHT))
+                flash_surf.set_alpha(128) # 0 is invisible, 255 is solid
+                flash_surf.fill((255, 0, 0)) # Red
+                self.screen.blit(flash_surf, (0, 0))
+
     def reset_game(self):
         """Resets all game variables for a new session."""
         self.integrity = C.MAX_INTEGRITY
