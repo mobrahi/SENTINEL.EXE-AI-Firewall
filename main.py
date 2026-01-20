@@ -50,6 +50,7 @@ class GameApp:
         self.wave_active = True
      
         self.spawn_timer = 0
+        self.score = 0
 
     # --- AI LOGIC (NON-BLOCKING) ---
 
@@ -103,19 +104,6 @@ class GameApp:
         
             self.advice_timer = pygame.time.get_ticks()
 
-        # """Worker thread for AI request."""
-        # try:
-        #     stats = f"Integrity: {self.integrity}%, Cycles: {self.cycles}, Towers: {len(self.towers)}"
-        #     prompt = f"Context: Cyber-defense game. Stats: {stats}. Act as tactical AI. 1-sentence tip."
-        #     response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        #     self.latest_advice = response.text
-        #     self.advice_timer = pygame.time.get_ticks() # Start the 5s timer now
-        # except Exception as e:
-        #     # Best Practice: Flush the print buffer for immediate terminal feedback
-        #     print(f"\n[!] AI CONNECTION ERROR: {e}", flush=True)
-        #     self.latest_advice = "AI_OFFLINE: Connection lost."
-        #     self.advice_timer = pygame.time.get_ticks()
-
     def fetch_victory_message(self):
         """Asynchronous fetch for game over taunt."""
         def thread_target():
@@ -140,9 +128,14 @@ class GameApp:
                     running = False
 
                 if event.type == pygame.KEYDOWN:
+                    # Existing space and help logic...
                     if event.key == pygame.K_SPACE and self.state == "START_MENU":
                         self.state = "AI_LOADING"
                         self.fetch_wave_lore()
+                    
+                    # NEW: Restart logic
+                    if event.key == pygame.K_r and self.state == "GAME_OVER":
+                        self.reset_game()
                     
                     if event.key == pygame.K_h and self.state == "PLAYING":
                         current_time = pygame.time.get_ticks()
@@ -155,7 +148,6 @@ class GameApp:
                             self.showing_advice = True
                             self.advice_timer = pygame.time.get_ticks()
                    
-
                 if event.type == pygame.MOUSEBUTTONDOWN and self.state == "PLAYING" and not self.game_over:
                     if self.cycles >= C.TOWER_COST:
                         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -163,11 +155,12 @@ class GameApp:
                         self.cycles -= C.TOWER_COST
                     else:
                         print("INSUFFICIENT CYCLES!") 
-                
-                        # In GameApp.__init__
-
+    
             self.update(dt)
             self.draw()
+
+            # Flip Buffer
+            pygame.display.flip()
 
         pygame.quit()
 
@@ -196,6 +189,7 @@ class GameApp:
             if hits:
                 for enemy_hit in hits:
                     self.cycles += C.REWARD_PER_VIRUS
+                    self.score += 1 # Increase score for every kill
 
             # Breach Detection
             for enemy in self.enemies:
@@ -234,7 +228,7 @@ class GameApp:
 
     def draw_text_overlay(self, text, color=C.ACCENT_COLOR):
         """Renders wrapped text safely inside a UI box."""
-        # 1. Safety Check: If there is no text, don't try to wrap or draw
+        # Safety Check: If there is no text, don't try to wrap or draw
         if not text:
             return
 
@@ -242,15 +236,15 @@ class GameApp:
         rect_width = C.SCREEN_WIDTH - (padding * 2)
         overlay_rect = pygame.Rect(padding, C.SCREEN_HEIGHT - 120, rect_width, 100)
     
-        # 2. Draw the background
+        # Draw the background
         pygame.draw.rect(self.screen, (0, 20, 0), overlay_rect) 
         pygame.draw.rect(self.screen, color, overlay_rect, 2)  
 
-        # 3. Wrap logic (Safety: Ensure width is at least 1)
+        # Wrap logic (Safety: Ensure width is at least 1)
         max_chars = max(1, rect_width // 10) 
         wrapped_lines = textwrap.wrap(text, width=max_chars)
 
-        # 4. Render lines
+        # Render lines
         for i, line in enumerate(wrapped_lines):
             # Calculate vertical position
             y_offset = overlay_rect.y + 15 + (i * 25)
@@ -262,9 +256,8 @@ class GameApp:
             line_surf = self.font.render(line, True, C.TEXT_COLOR)
             self.screen.blit(line_surf, (overlay_rect.x + 10, y_offset))
 
-
     def draw(self):
-        # 1. Clear Screen
+        # Clear Screen
         self.screen.fill(C.BG_COLOR)
         
         if self.state in ["START_MENU", "AI_LOADING"]:
@@ -275,18 +268,18 @@ class GameApp:
                     self.screen.blit(text_surf, (50, 100 + (i * 30)))
         
         elif self.state in ["PLAYING", "GAME_OVER"]:
-            # 2. Draw World FIRST (So UI stays on top)
+            # Draw World FIRST (So UI stays on top)
             self.towers.draw(self.screen)
             self.enemies.draw(self.screen)
             self.projectiles.draw(self.screen)
             pygame.draw.rect(self.screen, C.CORE_COLOR, (C.SCREEN_WIDTH//2-20, C.SCREEN_HEIGHT//2-20, 40, 40))
 
-            # 3. Draw UI Bar
+            # Draw UI Bar
             pygame.draw.rect(self.screen, (50, 0, 0), (20, 20, 200, 20)) # Dark Red BG
             health_fill = (self.integrity / C.MAX_INTEGRITY) * 200
             pygame.draw.rect(self.screen, C.ACCENT_COLOR, (20, 20, health_fill, 20)) # Health Fill
             
-            # 4. Draw UI Text (With slight black shadow for 2026 visibility standards)
+            # Draw UI Text (With slight black shadow for 2026 visibility standards)
             integrity_str = f"INTEGRITY: {self.integrity}%"
             cycles_str = f"CPU_CYCLES: {self.cycles} Ghz"
             cost_str = f"NODE_COST: {C.TOWER_COST}" # Added the specific node cost
@@ -300,15 +293,54 @@ class GameApp:
             # Draw individual tower cost (so player knows how much they need)
             self.screen.blit(self.font.render(cost_str, True, (200, 200, 200)), (20, 95))
 
-            # 5. Overlays (Drawn last to be on very top)
+            # --- INSERT SCORE HERE (Top Right) ---
+            score_text = self.font.render(f"VIRUS_PURGED: {self.score}", True, C.TEXT_COLOR)
+            self.screen.blit(score_text, (C.SCREEN_WIDTH - 250, 20))
+
+            # Overlays (Drawn last to be on very top)
             if self.showing_advice:
                 self.draw_text_overlay(self.latest_advice)
 
             if self.state == "GAME_OVER":
-                self.draw_text_overlay(self.virus_taunt, color=(255, 0, 0))
-
-        # 6. Flip Buffer
-        pygame.display.flip()
+                # 1. Darken the background
+                overlay = pygame.Surface((C.SCREEN_WIDTH, C.SCREEN_HEIGHT), pygame.SRCALPHA)
+                overlay.fill((20, 0, 0, 210)) # Deep red tinted darkness
+                self.screen.blit(overlay, (0, 0))
+            
+                # 2. Critical Status Text
+                status_text = self.font.render("FIREWALL STATUS: [OFFLINE]", True, (255, 0, 0))
+                self.screen.blit(status_text, (C.SCREEN_WIDTH//2 - 150, C.SCREEN_HEIGHT//2 - 100))
+            
+                # 3. FAILURE Header
+                fail_text = self.font.render("CRITICAL_FAILURE: SYSTEM_REDACTED", True, (255, 50, 50))
+                self.screen.blit(fail_text, (C.SCREEN_WIDTH//2 - 200, C.SCREEN_HEIGHT//2 - 60))
+            
+                # 4. The AI Virus Taunt (Indented to look like a console output)
+                taunt_surf = self.font.render(f"> {self.virus_taunt}", True, (0, 255, 150))
+                self.screen.blit(taunt_surf, (50, C.SCREEN_HEIGHT//2 + 10))
+            
+                # 5. REBOOT Instruction (Centered at bottom)
+                reboot_text = self.font.render("--- PRESS 'R' TO REBOOT SYSTEM ---", True, (255, 255, 255))
+                self.screen.blit(reboot_text, (C.SCREEN_WIDTH//2 - 180, C.SCREEN_HEIGHT - 80))
+    
+    def reset_game(self):
+        """Resets all game variables for a new session."""
+        self.integrity = C.MAX_INTEGRITY
+        self.cycles = C.STARTING_CYCLES
+        self.game_over = False
+        self.ai_called_end = False
+        self.spawn_timer = 0
+        self.virus_taunt = ""
+        self.score = 0
+        
+        # Clear all active sprites
+        self.enemies.empty()
+        self.towers.empty()
+        self.projectiles.empty()
+        
+        # Go back to the lore screen or main menu
+        self.state = "START_MENU"
+        self.lore_text = "Firewall Re-initialized. Press SPACE to start..."
 
 if __name__ == "__main__":
     game = GameApp()
