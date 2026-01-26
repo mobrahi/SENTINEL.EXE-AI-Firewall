@@ -62,8 +62,3 @@ class Projectile(pygame.sprite.Sprite):
         direction = (target_pos - self.pos).normalize()
         self.pos += direction * self.speed
         self.rect.center = self.pos
-
-        # Collision detection.   # We want main.py to handle the "Death Event" so it can give you money.
-        # if self.rect.colliderect(self.target.rect):
-        #     self.target.kill() # For now, one hit kills the virus
-        #     self.kill()

@@ -12,7 +12,6 @@ from tower import Tower
 # Initialize AI
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
-#client = genai.Client(api_key="GOOGLE_API_KEY")
 
 class GameApp:
     def __init__(self):
@@ -159,6 +158,11 @@ class GameApp:
                         self.cycles -= C.TOWER_COST
                     else:
                         print("INSUFFICIENT CYCLES!") 
+                
+                if event.type == pygame.MOUSEBUTTONDOWN and self.state == "PLAYING" and not self.game_over:
+                    # Get the position and pass it to the helper method
+                    mouse_pos = pygame.mouse.get_pos()
+                    self.attempt_place_tower(mouse_pos)
     
             self.update(dt)
             self.draw()
@@ -168,6 +172,24 @@ class GameApp:
 
         pygame.quit()
 
+    # The refactored method
+    def attempt_place_tower(self, pos):
+        # Using 'cycles' as the currency variable from your first snippet
+        if self.cycles >= C.TOWER_COST:
+            new_tower = Tower(pos[0], pos[1])
+            
+            # Check for overlaps before spending money
+            if not pygame.sprite.spritecollideany(new_tower, self.towers):
+                self.towers.add(new_tower)
+                self.cycles -= C.TOWER_COST
+                print(f"Tower built! Remaining Cycles: {self.cycles}")
+            else:
+                print("PLACEMENT BLOCKED: Area occupied.")
+        else:
+            print("INSUFFICIENT CYCLES: System resources low.")
+            # Trigger the AI advice thread
+            self.fetch_ai_advice()
+    
     def update(self, dt):
             # Update spawn logic in your run loop
         if self.state == "PLAYING" and not self.game_over and self.wave_active:
