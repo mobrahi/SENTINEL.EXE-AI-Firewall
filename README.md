@@ -133,6 +133,12 @@ python3 main.py
 
 ---
 
+### 🛠️ Lessons Learned
+
+During development, I utilized a branching strategy (main/dev) to experiment with UI enhancements. This allowed me to iterate on a dynamic resource-tracking system while ensuring the core submission remained stable and playable.
+
+---
+
 ### 🛡️ Safety Setting
 
 I utilized the google.genai.types module to explicitly define safety thresholds. This ensures that even if the game lore is generated dynamically, it remains within the boundaries of a 'Teen' rated game experience by blocking low-probability harmful content.
@@ -147,6 +153,18 @@ I utilized the google.genai.types module to explicitly define safety thresholds.
 * [x] Tower Placement & Currency System
 * [x] AI Strategy Guide & Game Over Taunts
 * [ ] Deployment to Google Cloud Run (This would be your final step!)
+
+---
+
+### 🚀 Future Roadmap
+
+* Dynamic Resource UI: Implement real-time color-coding for the "Cycles" counter to provide immediate visual feedback on affordability.
+
+* Advanced Tactical Subroutines: Expand the Gemini AI integration to analyze specific enemy wave compositions and suggest optimal tower placements.
+
+* Expansion Packs: Add "Sniper" and "Area of Effect" nodes to increase tactical variety.
+
+* Global Leaderboard: A backend integration to track high scores across the cyber-defense network.
 
 ---
 
