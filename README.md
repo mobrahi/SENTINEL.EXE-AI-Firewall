@@ -1,9 +1,13 @@
 
 ---
 
-## 📄 SENTINEL.EXE | AI-Powered Firewall Defense
+## 🎮 SENTINEL.EXE | AI-Powered Firewall Defense
 
-### 🌌 Overview
+![SENTINEL.EXE Project Icon](assets/logo.png)
+
+> **"SYSTEM_NOTE:** The localized UI corruption in the project icon (FIREWAALL) is a thematic representation of the virus's impact on the system's visual subroutines."
+
+### 🚀 Overview
 
 **SENTINEL.EXE** is an experimental Tower Defense game built for the **2026 Google AI "New Year, New You" Portfolio Challenge**.
 
@@ -32,6 +36,8 @@ This project features deep integration with **Google Gemini 3 Flash** to create 
 
 ## 🏛️ Architectural Narrative: AI Integration Strategy
 In developing SENTINEL.EXE, the core architectural goal was to move beyond "AI as a gimmick" and treat the Gemini 3 Flash model as a critical, yet reliable, system component. Two key design patterns were implemented to achieve this: Event-Driven AI Integration and Robust Resilience Logic.
+
+**Containerization for Cloud Portability**: I containerized the application using Docker to ensure environment parity between local development and production. By utilizing a multi-stage-ready Dockerfile and a .dockerignore file, I optimized the build for Google Cloud Run deployment, demonstrating an 'Infrastructure-as-Code' mindset."
 
 ### ⚡ 1. Event-Driven AI Calls
 Traditional AI-integrated loops often suffer from "API Churn," where the system polls the model too frequently. For SENTINEL.EXE, I implemented an Event-Driven pattern:
@@ -150,4 +156,3 @@ I utilized the google.genai.types module to explicitly define safety thresholds.
 * Project built for the [Google AI Portfolio Challenge 2026](https://dev.to/challenges).
 
 ---
-
