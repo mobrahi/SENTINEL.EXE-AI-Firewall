@@ -11,7 +11,8 @@ from tower import Tower
 
 # Initialize AI
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+#client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+client = genai.Client(api_key="GOOGLE_API_KEY")
 
 class GameApp:
     def __init__(self):
@@ -208,7 +209,6 @@ class GameApp:
                         self.cycles += C.REWARD_PER_VIRUS
                         self.score += 1 # Increase score for every kill
                         print(f"Virus Purged! Total Score: {self.score}")
-
            
             for enemy in self.enemies:
                 if enemy.rect.colliderect(self.core_rect):

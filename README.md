@@ -18,8 +18,9 @@ Players take on the role of the last active security protocol in a dying superco
 This project features deep integration with **Google Gemini 3 Flash** to create a dynamic, ever-evolving gameplay experience:
 
 * **Lore Generation:** The game's name, backstory, and world-building were procedurally generated using the Gemini API.
-* **Dynamic Enemy Intel:** (Planned) Gemini generates unique descriptions and "threat levels" for each wave of viruses.
-* **AI Co-Pilot:** (Planned) A real-time suggestion system that analyzes your defense grid and suggests optimal tower placement using the latest Google GenAI SDK.
+* **Dynamic Enemy Intel:** (Implemented) Gemini generates unique descriptions and "threat levels" for each wave of viruses.
+* **AI Co-Pilot** (Implemented): A real-time tactical advisor. Pressing 'H' sends current game metadata (Integrity, Cycles, Towers) to Gemini, which returns a context-aware strategic tip.
+* **Sentient Antagonist** (Implemented): When the core integrity hits 0%, Gemini generates a unique "System Compromised" taunt based on the player's final performance.
 
 ---
 
@@ -112,8 +113,8 @@ python3 main.py
 ## 🛠 Technical Challenges & Solutions
 
 ### 🤖 Real-Time AI Integration
-**Challenge:** How do you query a Cloud LLM without freezing a 60FPS game loop?
-**Solution:** Offloaded Gemini API calls to a **Background Thread**, allowing the main game loop to continue rendering and processing input. A thread-safe flag system was implemented to update the UI once the AI response is received.
+**Challenge:** How do you query a Cloud LLM without breaking the player's immersion?
+**Solution:** Implemented a **State-Based Loading Sequence**. When calling the Gemini API, the game transitions to an AI_LOADING state, displaying a thematic "Synchronizing with Neural Network" message. This prevents the game from appearing frozen and ensures a smooth transition once the data is received.
 
 ### 📉 Smart Rate-Limit Handling (429 Handling)
 **Challenge:** Managing the Google Gemini Free Tier limits (15 requests/min).
@@ -136,9 +137,10 @@ I utilized the google.genai.types module to explicitly define safety thresholds.
 
 * [x] Core Game Engine (Pygame + Grid System)
 * [x] AI Identity Integration (Gemini 3 Flash)
-* [ ] Enemy Pathfinding & Wave Logic
-* [ ] Tower Placement System
-* [ ] Deployment to Google Cloud Run
+* [x] Enemy Pathfinding & Wave Logic
+* [x] Tower Placement & Currency System
+* [x] AI Strategy Guide & Game Over Taunts
+* [ ] Deployment to Google Cloud Run (This would be your final step!)
 
 ---
 
