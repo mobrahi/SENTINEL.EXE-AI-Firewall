@@ -11,8 +11,8 @@ from tower import Tower
 
 # Initialize AI
 load_dotenv()
-#client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
-client = genai.Client(api_key="GOOGLE_API_KEY")
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+#client = genai.Client(api_key="GOOGLE_API_KEY")
 
 class GameApp:
     def __init__(self):
@@ -63,7 +63,7 @@ class GameApp:
         try:
             prompt = "Describe a computer virus wave in one short, gritty sentence for a cyber-security game."
             response = client.models.generate_content(
-                model="gemini-2.5-flash", # Use the GA stable version
+                model="gemini-2.0-flash", # Use the GA stable version
                 contents=prompt
             )
             self.lore_text = response.text
@@ -87,7 +87,7 @@ class GameApp:
             prompt = f"Cyber-defense context. Stats: {stats}. 1-sentence tip."
         
             response = client.models.generate_content(
-                model="gemini-2.5-flash", 
+                model="gemini-2.0-flash", 
                 contents=prompt
             )
             self.latest_advice = response.text
@@ -113,7 +113,7 @@ class GameApp:
         def thread_target():
             try:
                 prompt = "The firewall has failed. Act as a victorious computer virus. 1-sentence chilling victory message."
-                response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+                response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
                 self.virus_taunt = response.text
             except Exception:
                 self.virus_taunt = "CORE_TERMINATED: ALL DATA BELONGS TO THE HIVE."
