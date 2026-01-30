@@ -1,7 +1,22 @@
-__pycache__/
-.DS_Store
-.env
-*.pyc
-venv/
+# Environments
 .venv/
+venv/
 test_env/
+env/
+
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Secret Keys
+.env
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
