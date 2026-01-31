@@ -4,7 +4,6 @@ from flask import Flask, send_from_directory
 
 app = Flask(__name__, static_folder='build/web')
 
-# Explicitly set MIME types for WASM and Pygame assets
 mimetypes.add_type('application/wasm', '.wasm')
 mimetypes.add_type('application/octet-stream', '.so')
 mimetypes.add_type('application/octet-stream', '.apk')
@@ -12,9 +11,9 @@ mimetypes.add_type('text/javascript', '.js')
 
 @app.after_request
 def add_header(response):
-    # These headers are required for some WASM environments
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-    response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+    # 'credentialless' is the magic word here to fix the ERR_BLOCKED_BY_RESPONSE
+    response.headers['Cross-Origin-Embedder-Policy'] = 'credentialless'
     return response
 
 @app.route('/')
