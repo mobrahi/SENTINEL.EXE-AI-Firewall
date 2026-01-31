@@ -1,0 +1,10 @@
+.git
+.gitignore
+.ssh/
+.npm/
+.config/
+.gemini/
+.docker/
+SENTINEL.EXE-AI-Firewall/build/
+**/__pycache__/
+*.pyc
