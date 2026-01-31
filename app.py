@@ -1,10 +1,5 @@
 import os
-import mimetypes
 from flask import Flask, send_from_directory
-
-# Ensure the browser knows how to handle WASM files
-mimetypes.add_type('application/wasm', '.wasm')
-mimetypes.add_type('application/octet-stream', '.so')
 
 app = Flask(__name__, static_folder='build/web', static_url_path='')
 
@@ -14,9 +9,13 @@ def index():
 
 @app.route('/<path:path>')
 def serve_static(path):
-    # This is the critical fix: it looks for the file in your build/web folder
-    # even if the path has many subdirectories.
-    return send_from_directory(app.static_folder, path)
+    response = send_from_directory(app.static_folder, path)
+    # Force the browser to treat .so and .wasm as binary data
+    if path.endswith('.wasm'):
+        response.headers['Content-Type'] = 'application/wasm'
+    if path.endswith('.so'):
+        response.headers['Content-Type'] = 'application/octet-stream'
+    return response
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
