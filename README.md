@@ -110,7 +110,7 @@ GOOGLE_API_KEY=your_api_key_here
 #### 4. Run the Game
 
 ```bash
-python3 main.py
+python3 game/main.py
 
 ```
 

@@ -1,4 +1,6 @@
-pygame==2.6.1
-python-dotenv==1.2.1
-google-genai==1.59.0
-requests==2.32.5
+flask
+gunicorn
+google-genai
+python-dotenv
+requests
+pygame
