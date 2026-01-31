@@ -3,7 +3,7 @@
 
 ## 🎮 SENTINEL.EXE | AI-Powered Firewall Defense
 
-![SENTINEL.EXE Project Icon](assets/logo.png)
+![SENTINEL.EXE Project Icon](game/assets/logo.png)
 
 > **"SYSTEM_NOTE:** The localized UI corruption in the project icon (FIREWAALL) is a thematic representation of the virus's impact on the system's visual subroutines."
 
@@ -152,7 +152,7 @@ I utilized the google.genai.types module to explicitly define safety thresholds.
 * [x] Enemy Pathfinding & Wave Logic
 * [x] Tower Placement & Currency System
 * [x] AI Strategy Guide & Game Over Taunts
-* [ ] Deployment to Google Cloud Run (This would be your final step!)
+* [x] Deployment to Google Cloud Run (This would be your final step!)
 
 ---
 
