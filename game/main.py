@@ -1,25 +1,39 @@
-import asyncio # REQUIRED for Web
+import asyncio
 import pygame
-import constants as C
 import os
 import random
-import threading
 import textwrap
-from dotenv import load_dotenv
-from google import genai
-from enemy import Enemy
-from tower import Tower
+import importlib
+import threading
 
-# Initialize AI
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+# --- THE GHOST LAYER ---
+WEB_MODE = os.path.exists('/dev/canvas') or os.path.exists('/home/webuser')
+
+genai = None
+client = None
+
+if not WEB_MODE:
+    try:
+        d_mod = "desktop" + "_imports" 
+        desktop = importlib.import_module(d_mod)
+        genai = desktop.genai
+        client = desktop.client
+    except Exception as e:
+        print(f"Desktop AI Load Failed: {e}")
+
+try:
+    C = importlib.import_module("constants")
+    Enemy = importlib.import_module("enemy").Enemy
+    Tower = importlib.import_module("tower").Tower
+except ImportError as e:
+    print(f"Critical Module Load Failure: {e}")
 
 class GameApp:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((C.SCREEN_WIDTH, C.SCREEN_HEIGHT))
         pygame.display.set_caption("SENTINEL.EXE | AI Firewall")
-        self.font = pygame.font.SysFont("Courier", 18)
+        self.font = pygame.font.SysFont("monospace", 18)
         self.clock = pygame.time.Clock()
 
         self.core_rect = pygame.Rect(C.SCREEN_WIDTH//2-20, C.SCREEN_HEIGHT//2-20, 40, 40)
@@ -57,27 +71,38 @@ class GameApp:
         self.flash_timer = 0
 
     # --- AI LOGIC (ASYNC & NON-BLOCKING) ---
-
     async def fetch_wave_lore(self):
-        """Async lore fetch to keep the 'Loading' screen responsive"""
+        """Async lore fetch: Uses threads on Desktop, local backup on Web."""
         self.state = "AI_LOADING"
-        try:
-            # We use a thread for the API call to avoid blocking the async loop
-            def call_api():
-                prompt = "Describe a computer virus wave in one short, gritty sentence for a cyber-security game."
-                return client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
-            
-            response = await asyncio.to_thread(call_api)
-            self.lore_text = response.text
-        except Exception:
+        # 1. Guard for Web or Missing Client
+        if WEB_MODE or client is None: 
             self.lore_text = random.choice(C.LOCAL_LORE_BACKUP)
+        else:
+            try:
+                def call_api():
+                    prompt = "Describe a computer virus wave in one short, gritty sentence."
+                    # Ensure you use the correct SDK method here
+                    return client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+                
+                response = await asyncio.to_thread(call_api)
+                self.lore_text = response.text
+            except Exception:
+                self.lore_text = random.choice(C.LOCAL_LORE_BACKUP)
+        
         self.state = "PLAYING"
 
     def fetch_ai_advice(self):
-        """Starts a background thread to get advice without freezing."""
+        """Guarded thread creation for Desktop only."""
+        if WEB_MODE or client is None:
+            self.latest_advice = random.choice(C.LOCAL_LORE_BACKUP)
+            self.showing_advice = True
+            self.advice_timer = pygame.time.get_ticks()
+            return # <--- IMPORTANT: Exit before touching 'threading'
+
         if not self.showing_advice:
             self.latest_advice = "ACCESSING TACTICAL ADVISOR..."
             self.showing_advice = True
+            # Only desktop reaches here
             thread = threading.Thread(target=self._get_gemini_advice_thread)
             thread.daemon = True
             thread.start()
@@ -100,13 +125,19 @@ class GameApp:
         self.advice_timer = pygame.time.get_ticks()
 
     def fetch_victory_message(self):
+        """Guarded thread creation for Desktop only."""
+        if WEB_MODE or client is None:
+            self.virus_taunt = "CORE_TERMINATED: ALL DATA BELONGS TO THE HIVE."
+            return
+
         def thread_target():
             try:
-                prompt = "The firewall has failed. Act as a victorious computer virus. 1-sentence chilling victory message."
+                prompt = "The firewall has failed. Act as a victorious computer virus. 1-sentence message."
                 response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
                 self.virus_taunt = response.text
             except Exception:
                 self.virus_taunt = "CORE_TERMINATED: ALL DATA BELONGS TO THE HIVE."
+        
         threading.Thread(target=thread_target, daemon=True).start()
 
     # --- CORE LOOP (UPDATED FOR ASYNC) ---
