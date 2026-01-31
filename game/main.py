@@ -39,7 +39,7 @@ class GameApp:
         self.core_rect = pygame.Rect(C.SCREEN_WIDTH//2-20, C.SCREEN_HEIGHT//2-20, 40, 40)
         
         # Stats
-        self.cycles = C.STARTING_CYCLES
+        self.cycles = 100
         self.integrity = C.MAX_INTEGRITY
         self.game_over = False
         
@@ -288,7 +288,7 @@ class GameApp:
             pygame.draw.rect(self.screen, C.ACCENT_COLOR, (20, 20, health_fill, 20))
             
             self.screen.blit(self.font.render(f"INTEGRITY: {int(self.integrity)}%", True, C.TEXT_COLOR), (20, 45))
-            self.screen.blit(self.font.render(f"CPU_CYCLES: {self.cycles} Ghz", True, C.ACCENT_COLOR), (20, 70))
+            self.screen.blit(self.font.render(f"CPU_CYCLES: {self.cycles} Ghz", True, C.ACCENT_COLOR), (0, 255, 0))
             self.screen.blit(self.font.render(f"VIRUS_PURGED: {self.score}", True, C.TEXT_COLOR), (C.SCREEN_WIDTH - 250, 20))
 
             if self.showing_advice:
