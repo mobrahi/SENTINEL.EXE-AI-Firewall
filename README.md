@@ -152,7 +152,7 @@ I utilized the google.genai.types module to explicitly define safety thresholds.
 * [x] Enemy Pathfinding & Wave Logic
 * [x] Tower Placement & Currency System
 * [x] AI Strategy Guide & Game Over Taunts
-* [x] Deployment to Google Cloud Run (This would be your final step!)
+* [x] Deployment to Google Cloud Run 
 
 ---
 
