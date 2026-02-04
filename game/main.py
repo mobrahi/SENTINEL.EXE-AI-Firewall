@@ -1,11 +1,10 @@
-
 import asyncio
 import pygame
 import os
 import random
 import textwrap
-import threading
 import importlib
+import threading
 
 # --- THE GHOST LAYER ---
 WEB_MODE = os.path.exists('/dev/canvas') or os.path.exists('/home/webuser')
@@ -13,10 +12,8 @@ WEB_MODE = os.path.exists('/dev/canvas') or os.path.exists('/home/webuser')
 genai = None
 client = None
 
-# 1. Handle Desktop-only AI
 if not WEB_MODE:
     try:
-        # Split string to hide from Pygbag scanner
         d_mod = "desktop" + "_imports" 
         desktop = importlib.import_module(d_mod)
         genai = desktop.genai
@@ -24,7 +21,6 @@ if not WEB_MODE:
     except Exception as e:
         print(f"Desktop AI Load Failed: {e}")
 
-# 2. Handle Local Game Modules (The "Scanner Trick")
 try:
     C = importlib.import_module("constants")
     Enemy = importlib.import_module("enemy").Enemy
@@ -32,20 +28,18 @@ try:
 except ImportError as e:
     print(f"Critical Module Load Failure: {e}")
 
-# ... (Rest of your GameApp class code starts here) ...
-
 class GameApp:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((C.SCREEN_WIDTH, C.SCREEN_HEIGHT))
         pygame.display.set_caption("SENTINEL.EXE | AI Firewall")
-        self.font = pygame.font.SysFont("monospace", 18)
+        self.font = pygame.font.SysFont(None, 24)
         self.clock = pygame.time.Clock()
 
-        self.core_rect = pygame.Rect(C.SCREEN_WIDTH//2-20, C.SCREEN_HEIGHT//2-20, 40, 40)
+        self.core_rect = pygame.Rect(1280//2-20, 720//2-20, 40, 40)
         
         # Stats
-        self.cycles = C.STARTING_CYCLES
+        self.cycles = 100
         self.integrity = C.MAX_INTEGRITY
         self.game_over = False
         
@@ -294,7 +288,7 @@ class GameApp:
             pygame.draw.rect(self.screen, C.ACCENT_COLOR, (20, 20, health_fill, 20))
             
             self.screen.blit(self.font.render(f"INTEGRITY: {int(self.integrity)}%", True, C.TEXT_COLOR), (20, 45))
-            self.screen.blit(self.font.render(f"CPU_CYCLES: {self.cycles} Ghz", True, C.ACCENT_COLOR), (20, 70))
+            self.screen.blit(self.font.render(f"CPU_CYCLES: {self.cycles} Ghz", True, C.ACCENT_COLOR), (C.SCREEN_WIDTH - 255, 0))
             self.screen.blit(self.font.render(f"VIRUS_PURGED: {self.score}", True, C.TEXT_COLOR), (C.SCREEN_WIDTH - 250, 20))
 
             if self.showing_advice:

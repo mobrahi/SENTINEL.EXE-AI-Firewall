@@ -1,0 +1,9 @@
+.git
+.gitignore
+.ssh/
+.npm/
+.config/
+.gemini/
+.docker/
+**/__pycache__/
+*.pyc
