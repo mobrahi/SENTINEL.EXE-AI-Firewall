@@ -19,7 +19,7 @@ Players take on the role of the last active security protocol in a dying superco
 
 ### 🤖 AI Integration (The Challenge Edge)
 
-This project features deep integration with **Google Gemini 3 Flash** to create a dynamic, ever-evolving gameplay experience:
+This project features deep integration with **Google Gemini 2.0 Flash** to create a dynamic, ever-evolving gameplay experience:
 
 * **Lore Generation:** The game's name, backstory, and world-building were procedurally generated using the Gemini API.
 * **Dynamic Enemy Intel:** (Implemented) Gemini generates unique descriptions and "threat levels" for each wave of viruses.
@@ -69,7 +69,7 @@ If the system detects a Network Timeout, 429 Quota Limit, or Safety Filter Trigg
 
 * **Language:** Python 3.11+
 * **Game Engine:** Pygame
-* **AI Engine:** [Google GenAI SDK](https://pypi.org/project/google-genai/) (Gemini 3 Flash)
+* **AI Engine:** [Google GenAI SDK](https://pypi.org/project/google-genai/) (Gemini 2.0 Flash)
 * **Deployment:** Google Cloud Run (Containerized via Docker)
 * **Environment:** `python-dotenv` for secure API key management.
 
