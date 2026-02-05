@@ -35,7 +35,7 @@ This project features deep integration with **Google Gemini 2.0 Flash** to creat
 ---
 
 ## 🏛️ Architectural Narrative: AI Integration Strategy
-In developing SENTINEL.EXE, the core architectural goal was to move beyond "AI as a gimmick" and treat the Gemini 3 Flash model as a critical, yet reliable, system component. Two key design patterns were implemented to achieve this: Event-Driven AI Integration and Robust Resilience Logic.
+In developing SENTINEL.EXE, the core architectural goal was to move beyond "AI as a gimmick" and treat the Gemini 2.0 Flash model as a critical, yet reliable, system component. Two key design patterns were implemented to achieve this: Event-Driven AI Integration and Robust Resilience Logic.
 
 **Containerization for Cloud Portability**: I containerized the application using Docker to ensure environment parity between local development and production. By utilizing a multi-stage-ready Dockerfile and a .dockerignore file, I optimized the build for Google Cloud Run deployment, demonstrating an 'Infrastructure-as-Code' mindset."
 
