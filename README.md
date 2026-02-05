@@ -29,7 +29,7 @@ This project features deep integration with **Google Gemini 2.0 Flash** to creat
 ---
 
 ### 🔧 Technical Design Decisions
-- **AI-On-Demand:** To optimize performance, Gemini 3 Flash is only invoked during wave transitions.
+- **AI-On-Demand:** To optimize performance, Gemini 2.0 Flash is only invoked during wave transitions.
 - **Fail-Safe Architecture:** Implemented a 'Local Lore' fallback system. This ensures the game adheres to the Responsible AI pillar of **Robustness** by maintaining uptime during API outages.
 
 ---
