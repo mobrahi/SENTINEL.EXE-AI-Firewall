@@ -20,3 +20,8 @@ Thumbs.db
 # IDEs
 .vscode/
 .idea/
+
+*.apk
+build/
+.env
+venv/
